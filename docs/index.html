@@ -1,229 +1,299 @@
 <!DOCTYPE html>
-<html>
+<html lang="ckb" dir="rtl">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>چەرخی بەختی "ARAN"</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
 
-<title>ARAN Wheel</title>
+        h1 {
+            margin-top: 0;
+            color: #ffcc00;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            z-index: 11;
+        }
 
-<style>
-body{
-  background:#111;
-  color:white;
-  text-align:center;
-  font-family:Arial;
-}
+        .wheel-container {
+            position: relative;
+            width: 600px;
+            height: 600px;
+            margin: 20px auto;
+        }
 
-canvas{
-  margin-top:20px;
-}
+        .wheel-border {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-sizing: border-box;
+            z-index: 2;
+            /* Use the gold ring from image_1.png */
+            background: radial-gradient(circle at center, transparent 60%, rgba(212, 175, 55, 0.8) 90%, #d4af37 100%),
+            url('image_1.png');
+            background-size: cover;
+            background-position: center;
+            filter: drop-shadow(0 0 15px #d4af37);
+        }
 
-input{
-  padding:12px;
-  font-size:18px;
-  width:70%;
-}
+        #wheelCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: transparent; /* Center is transparent to see background ring */
+            transition: transform 5s cubic-bezier(0.2, 0.8, 0.3, 1);
+            z-index: 1;
+        }
 
-button{
-  padding:12px 25px;
-  font-size:18px;
-  margin:10px;
-  border-radius:10px;
-}
+        /* Pointer */
+        .pointer {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #d4af37; /* Gold color */
+            z-index: 10;
+            filter: drop-shadow(0 5px 2px rgba(0,0,0,0.5));
+        }
 
-#result{
-  font-size:25px;
-}
-</style>
+        /* Controls area */
+        .controls {
+            margin-top: 30px;
+            text-align: center;
+            z-index: 11;
+        }
 
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid #d4af37;
+            background-color: #1a1a1a;
+            color: white;
+            border-radius: 5px;
+            width: 250px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-left: 10px;
+            background-color: #d4af37; /* Gold color */
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #ffcc00;
+        }
+
+        button#spinButton:disabled {
+            background-color: #555;
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #messageArea {
+            margin-top: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff4444; /* Red for elimination */
+            min-height: 80px;
+            text-align: center;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+            z-index: 11;
+            padding: 20px;
+            background-color: rgba(0,0,0,0.7);
+            border-radius: 10px;
+            display: none; /* Hidden by default */
+        }
+        #messageArea.show {
+             display: block;
+        }
+
+        /* Player list */
+        #playerList {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #aaa;
+            max-width: 400px;
+            text-align: center;
+            z-index: 11;
+        }
+
+        /* Hidden canvas to pre-draw text */
+        canvas#textCanvas {
+            display: none;
+        }
+
+    </style>
 </head>
-
 <body>
 
-<h1>🎡 چەرخی بەخت ARAN</h1>
-
-<input id="name" placeholder="ناوی بەشداربوو">
-
-<br>
-
-<button onclick="addName()">➕ زیادکردن</button>
-
-<br>
-
-<canvas id="wheel" width="350" height="350"></canvas>
-
-<br>
-
-<button onclick="spin()">🎰 سووڕاندن</button>
-
-<h2 id="result"></h2>
-
-
-<script>
-
-let canvas=document.getElementById("wheel");
-let ctx=canvas.getContext("2d");
-
-let names=[];
-let angle=0;
-let spinning=false;
-
-
-function draw(){
-
-let center=175;
-let radius=170;
-
-ctx.clearRect(0,0,350,350);
-
-
-if(names.length){
-
-let part=(Math.PI*2)/names.length;
-
-
-names.forEach((name,i)=>{
-
-let start=angle+i*part;
-let end=start+part;
-
-
-ctx.beginPath();
-ctx.moveTo(center,center);
-ctx.arc(center,center,radius,start,end);
-
-
-ctx.fillStyle=
-"hsl("+(i*50)+",80%,50%)";
-
-
-ctx.fill();
-
-ctx.strokeStyle="white";
-ctx.stroke();
-
-
-ctx.save();
-
-ctx.translate(center,center);
-ctx.rotate(start+part/2);
-
-ctx.fillStyle="white";
-ctx.font="16px Arial";
-ctx.fillText(name,70,5);
-
-ctx.restore();
-
-
-});
-
-}
-
-
-// ناوەندی ARAN
-
-ctx.beginPath();
-ctx.arc(center,center,55,0,Math.PI*2);
-ctx.fillStyle="white";
-ctx.fill();
-
-
-ctx.fillStyle="black";
-ctx.font="22px Arial";
-ctx.textAlign="center";
-
-ctx.fillText("🛩️",center,165);
-ctx.fillText("ARAN",center,195);
-
-
-}
-
-
-function addName(){
-
-let n=document.getElementById("name").value;
-
-
-if(n){
-
-names.push(n);
-
-document.getElementById("name").value="";
-
-draw();
-
-}
-
-}
-
-
-
-function spin(){
-
-if(names.length==0){
-
-alert("سەرەتا ناو زیاد بکە");
-
-return;
-
-}
-
-
-if(spinning)return;
-
-spinning=true;
-
-
-let win=Math.floor(Math.random()*names.length);
-
-
-let rounds=8;
-
-
-angle += rounds*Math.PI*2;
-
-
-angle += win*((Math.PI*2)/names.length);
-
-
-let start=Date.now();
-
-
-function animate(){
-
-let now=Date.now();
-
-let progress=(now-start)/5000;
-
-
-if(progress<1){
-
-angle +=0.2*(1-progress);
-
-draw();
-
-requestAnimationFrame(animate);
-
-}else{
-
-draw();
-
-document.getElementById("result").innerHTML=
-"🏆 براوە: "+names[win];
-
-spinning=false;
-
-}
-
-}
-
-animate();
-
-}
-
-
-draw();
-
-</script>
-
+    <h1>چەرخی بەختی "ARAN"</h1>
+
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        <div class="wheel-border" id="lightRing"></div>
+        <canvas id="wheelCanvas" width="600" height="600"></canvas>
+    </div>
+
+    <div class="controls">
+        <input type="text" id="itemName" placeholder="ناوێک بنووسە و زەخت بکە زیادکردن">
+        <button id="addButton">زیادکردن</button>
+        <button id="spinButton" disabled>سوڕاندن</button>
+    </div>
+
+    <div id="messageArea"></div>
+    <div id="playerList">لیستی بەشداربووان: <span id="namesDisplay">هیچ</span></div>
+
+    <!-- Hidden canvas to draw text per slice -->
+    <canvas id="textCanvas" width="1000" height="100"></canvas>
+
+    <script>
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const spinButton = document.getElementById('spinButton');
+        const addButton = document.getElementById('addButton');
+        const itemNameInput = document.getElementById('itemName');
+        const messageArea = document.getElementById('messageArea');
+        const namesDisplay = document.getElementById('namesDisplay');
+        
+        const diameter = canvas.width;
+        const radius = diameter / 2;
+        let currentRotation = 0;
+        let isSpinning = false;
+
+        // Player Items
+        let items = [];
+
+        function updatePlayerList() {
+            if (items.length === 0) {
+                namesDisplay.textContent = 'هیچ';
+                spinButton.disabled = true;
+            } else {
+                namesDisplay.textContent = items.map(item => item.text).join(', ');
+                spinButton.disabled = false;
+            }
+        }
+
+        function drawWheel() {
+            const numSegments = items.length;
+            ctx.clearRect(0, 0, diameter, diameter);
+            
+            if (numSegments === 0) return; // Don't draw if no items
+
+            const arcSize = (2 * Math.PI) / numSegments;
+            const colors = ['#d4af37', '#1a1a1a', '#ffcc00', '#333333']; // Gold, Black, Bright Gold, Dark Grey
+
+            for (let i = 0; i < numSegments; i++) {
+                const angle = i * arcSize;
+                ctx.beginPath();
+                ctx.moveTo(radius, radius);
+                ctx.arc(radius, radius, radius, angle, angle + arcSize);
+                ctx.closePath();
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.fill();
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = '#fff';
+                ctx.stroke();
+
+                // Text
+                ctx.save();
+                ctx.translate(radius, radius);
+                ctx.rotate(angle + arcSize / 2);
+                ctx.textAlign = 'right';
+                ctx.fillStyle = (colors[i % colors.length] === '#1a1a1a' || colors[i % colors.length] === '#333333') ? '#d4af37' : '#1a1a1a'; // Contrast color
+                ctx.font = 'bold 24px Arial, sans-serif';
+                
+                // Handle long names: wrap text or shrink. For simplicity, we'll just truncate or shrink.
+                let text = items[i].text;
+                if (ctx.measureText(text).width > radius * 0.8) {
+                    ctx.font = 'bold 18px Arial, sans-serif';
+                }
+
+                // Draw text from hidden canvas or directly
+                ctx.fillText(text, radius - 40, 8);
+                ctx.restore();
+            }
+        }
+
+        spinButton.addEventListener('click', () => {
+            if (isSpinning || items.length === 0) return;
+            isSpinning = true;
+            spinButton.disabled = true;
+            spinButton.textContent = 'دەسوڕێت...';
+            messageArea.classList.remove('show');
+
+            // Random rotations (between 5 and 10 full spins) + extra random angle
+            const spinAngle = Math.floor(Math.random() * 2000) + 5000;
+            currentRotation += spinAngle;
+            canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(() => {
+                isSpinning = false;
+                spinButton.disabled = false;
+                spinButton.textContent = 'سوڕاندن';
+
+                // Calculate the final result based on rotation
+                const segmentAngle = 360 / items.length;
+                const normalizedRotation = (360 - (currentRotation % 360)) % 360;
+                // The pointer is at the top (0 degrees in our adjusted logic).
+                // After animation, the element at top is the winner.
+                const finalIndex = Math.floor(normalizedRotation / segmentAngle);
+                
+                const eliminatedPlayer = items[finalIndex];
+                
+                // Show elimination message
+                messageArea.textContent = `تکایە لێمان ببورە بەڕێز/خانم '${eliminatedPlayer.text}'، تۆ دەرکراوی لە یاری.`;
+                messageArea.classList.add('show');
+
+                // Remove the eliminated player from the list and redraw
+                items.splice(finalIndex, 1);
+                updatePlayerList();
+                drawWheel();
+
+            }, 5000); // Match CSS transition time
+        });
+
+        addButton.addEventListener('click', () => {
+            const name = itemNameInput.value.trim();
+            if (name) {
+                items.push({ text: name });
+                updatePlayerList();
+                drawWheel();
+                itemNameInput.value = '';
+            } else {
+                alert('تکایە ناوێک بنووسە.');
+            }
+        });
+
+        // Initial draw
+        drawWheel();
+
+    </script>
 </body>
 </html>
