@@ -2,87 +2,124 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎡 چەرخی بەخت</title>
 
 <style>
-body {
-  text-align: center;
-  font-family: Arial;
-  background: #222;
-  color: white;
+body{
+  text-align:center;
+  font-family:Arial;
+  background:#111;
+  color:white;
 }
 
-input {
-  padding: 10px;
-  width: 80%;
-  font-size: 18px;
+#wrapper{
+  position:relative;
+  width:300px;
+  height:300px;
+  margin:30px auto;
 }
 
-button {
-  padding: 12px 25px;
-  margin: 10px;
-  font-size: 18px;
-  border-radius: 10px;
-}
-
-#wheel {
-  width: 250px;
-  height: 250px;
-  border-radius: 50%;
-  margin: 20px auto;
-  background: conic-gradient(
-    red,
-    yellow,
-    green,
-    blue,
-    purple,
-    red
+#wheel{
+  width:300px;
+  height:300px;
+  border-radius:50%;
+  border:5px solid white;
+  position:relative;
+  overflow:hidden;
+  transition:5s;
+  background:conic-gradient(
+    #ff4d4d,
+    #ffd633,
+    #4dff88,
+    #4da6ff,
+    #cc66ff,
+    #ff4d4d
   );
-  transition: 5s;
 }
 
-#names {
-  font-size: 20px;
+.name{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform-origin:0 0;
+  font-size:16px;
+  font-weight:bold;
+  color:white;
 }
+
+#logo{
+  position:absolute;
+  width:80px;
+  height:80px;
+  background:white;
+  color:black;
+  border-radius:50%;
+  left:110px;
+  top:110px;
+  z-index:5;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:25px;
+  font-weight:bold;
+}
+
+input{
+  padding:10px;
+  font-size:18px;
+}
+
+button{
+  padding:12px 20px;
+  margin:10px;
+  font-size:18px;
+}
+
 </style>
-
 </head>
+
 
 <body>
 
-<h1>🎡 چەرخی بەخت</h1>
+<h1>🎡 چەرخی بەخت ARAN</h1>
 
-<input id="name" placeholder="ناوی بەشداربوو بنووسە">
+<input id="name" placeholder="ناوی بەشداربوو">
 
 <br>
 
 <button onclick="addName()">➕ زیادکردن</button>
 
-<div id="names"></div>
+
+<div id="wrapper">
 
 <div id="wheel"></div>
 
-<button onclick="spin()">🎰 دەستپێکردن</button>
+<div id="logo">
+ARAN
+</div>
+
+</div>
+
+
+<button onclick="spin()">🎡 سووڕاندن</button>
 
 <h2 id="result"></h2>
 
 
 <script>
 
-let players = [];
-let rotate = 0;
+let names=[];
+let rotation=0;
 
 
 function addName(){
 
-let name = document.getElementById("name").value;
+let n=document.getElementById("name").value;
 
-if(name){
+if(n){
 
-players.push(name);
+names.push(n);
 
-document.getElementById("names").innerHTML =
-"👥 بەشداربووان:<br>" + players.join("<br>");
+drawWheel();
 
 document.getElementById("name").value="";
 
@@ -92,37 +129,67 @@ document.getElementById("name").value="";
 
 
 
-function spin(){
+function drawWheel(){
 
-if(players.length == 0){
+let wheel=document.getElementById("wheel");
 
-alert("سەرەتا ناو زیاد بکە");
+wheel.innerHTML="";
 
-return;
+
+let part=360/names.length;
+
+
+names.forEach((name,i)=>{
+
+let el=document.createElement("div");
+
+el.className="name";
+
+el.innerHTML=name;
+
+let angle=i*part+part/2;
+
+el.style.transform=
+"rotate("+angle+"deg) translate(120px) rotate("+(-angle)+"deg)";
+
+wheel.appendChild(el);
+
+});
 
 }
 
 
-let random = Math.floor(Math.random()*players.length);
 
-rotate += 1800;
+function spin(){
 
-document.getElementById("wheel").style.transform =
-"rotate("+rotate+"deg)";
+if(names.length==0){
+alert("ناو زیاد بکە");
+return;
+}
 
 
-setTimeout(function(){
+let win=Math.floor(Math.random()*names.length);
 
-document.getElementById("result").innerHTML =
-"🏆 براوە: " + players[random];
+
+rotation+=360*5+(360/names.length)*win;
+
+
+document.getElementById("wheel").style.transform=
+"rotate("+rotation+"deg)";
+
+
+setTimeout(()=>{
+
+document.getElementById("result").innerHTML=
+"🏆 براوە: "+names[win];
 
 },5000);
 
 
 }
 
-</script>
 
+</script>
 
 </body>
 </html>
