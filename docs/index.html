@@ -3,80 +3,39 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>ARAN Wheel</title>
+
 <style>
 body{
-  text-align:center;
-  font-family:Arial;
   background:#111;
   color:white;
+  text-align:center;
+  font-family:Arial;
 }
 
-#wrapper{
-  position:relative;
-  width:300px;
-  height:300px;
-  margin:30px auto;
-}
-
-#wheel{
-  width:300px;
-  height:300px;
-  border-radius:50%;
-  border:5px solid white;
-  position:relative;
-  overflow:hidden;
-  transition:5s;
-  background:conic-gradient(
-    #ff4d4d,
-    #ffd633,
-    #4dff88,
-    #4da6ff,
-    #cc66ff,
-    #ff4d4d
-  );
-}
-
-.name{
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform-origin:0 0;
-  font-size:16px;
-  font-weight:bold;
-  color:white;
-}
-
-#logo{
-  position:absolute;
-  width:80px;
-  height:80px;
-  background:white;
-  color:black;
-  border-radius:50%;
-  left:110px;
-  top:110px;
-  z-index:5;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:25px;
-  font-weight:bold;
+canvas{
+  margin-top:20px;
 }
 
 input{
-  padding:10px;
+  padding:12px;
   font-size:18px;
+  width:70%;
 }
 
 button{
-  padding:12px 20px;
-  margin:10px;
+  padding:12px 25px;
   font-size:18px;
+  margin:10px;
+  border-radius:10px;
 }
 
+#result{
+  font-size:25px;
+}
 </style>
-</head>
 
+</head>
 
 <body>
 
@@ -88,73 +47,111 @@ button{
 
 <button onclick="addName()">➕ زیادکردن</button>
 
+<br>
 
-<div id="wrapper">
+<canvas id="wheel" width="350" height="350"></canvas>
 
-<div id="wheel"></div>
+<br>
 
-<div id="logo">
-ARAN
-</div>
-
-</div>
-
-
-<button onclick="spin()">🎡 سووڕاندن</button>
+<button onclick="spin()">🎰 سووڕاندن</button>
 
 <h2 id="result"></h2>
 
 
 <script>
 
+let canvas=document.getElementById("wheel");
+let ctx=canvas.getContext("2d");
+
 let names=[];
-let rotation=0;
+let angle=0;
+let spinning=false;
+
+
+function draw(){
+
+let center=175;
+let radius=170;
+
+ctx.clearRect(0,0,350,350);
+
+
+if(names.length){
+
+let part=(Math.PI*2)/names.length;
+
+
+names.forEach((name,i)=>{
+
+let start=angle+i*part;
+let end=start+part;
+
+
+ctx.beginPath();
+ctx.moveTo(center,center);
+ctx.arc(center,center,radius,start,end);
+
+
+ctx.fillStyle=
+"hsl("+(i*50)+",80%,50%)";
+
+
+ctx.fill();
+
+ctx.strokeStyle="white";
+ctx.stroke();
+
+
+ctx.save();
+
+ctx.translate(center,center);
+ctx.rotate(start+part/2);
+
+ctx.fillStyle="white";
+ctx.font="16px Arial";
+ctx.fillText(name,70,5);
+
+ctx.restore();
+
+
+});
+
+}
+
+
+// ناوەندی ARAN
+
+ctx.beginPath();
+ctx.arc(center,center,55,0,Math.PI*2);
+ctx.fillStyle="white";
+ctx.fill();
+
+
+ctx.fillStyle="black";
+ctx.font="22px Arial";
+ctx.textAlign="center";
+
+ctx.fillText("🛩️",center,165);
+ctx.fillText("ARAN",center,195);
+
+
+}
 
 
 function addName(){
 
 let n=document.getElementById("name").value;
 
+
 if(n){
 
 names.push(n);
 
-drawWheel();
-
 document.getElementById("name").value="";
 
-}
+draw();
 
 }
-
-
-
-function drawWheel(){
-
-let wheel=document.getElementById("wheel");
-
-wheel.innerHTML="";
-
-
-let part=360/names.length;
-
-
-names.forEach((name,i)=>{
-
-let el=document.createElement("div");
-
-el.className="name";
-
-el.innerHTML=name;
-
-let angle=i*part+part/2;
-
-el.style.transform=
-"rotate("+angle+"deg) translate(120px) rotate("+(-angle)+"deg)";
-
-wheel.appendChild(el);
-
-});
 
 }
 
@@ -163,31 +160,68 @@ wheel.appendChild(el);
 function spin(){
 
 if(names.length==0){
-alert("ناو زیاد بکە");
+
+alert("سەرەتا ناو زیاد بکە");
+
 return;
+
 }
+
+
+if(spinning)return;
+
+spinning=true;
 
 
 let win=Math.floor(Math.random()*names.length);
 
 
-rotation+=360*5+(360/names.length)*win;
+let rounds=8;
 
 
-document.getElementById("wheel").style.transform=
-"rotate("+rotation+"deg)";
+angle += rounds*Math.PI*2;
 
 
-setTimeout(()=>{
+angle += win*((Math.PI*2)/names.length);
+
+
+let start=Date.now();
+
+
+function animate(){
+
+let now=Date.now();
+
+let progress=(now-start)/5000;
+
+
+if(progress<1){
+
+angle +=0.2*(1-progress);
+
+draw();
+
+requestAnimationFrame(animate);
+
+}else{
+
+draw();
 
 document.getElementById("result").innerHTML=
 "🏆 براوە: "+names[win];
 
-},5000);
-
+spinning=false;
 
 }
 
+}
+
+animate();
+
+}
+
+
+draw();
 
 </script>
 
