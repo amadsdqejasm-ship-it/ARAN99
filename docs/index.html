@@ -29,7 +29,7 @@
 
         h2 {
             margin: 10px 0;
-            color: #fff;
+            color: #d4af37; /* Gold color */
             font-size: 18px;
             text-align: center;
         }
@@ -54,7 +54,7 @@
         input[type="text"] {
             flex: 1;
             padding: 10px;
-            border: 1px solid #2a3447;
+            border: 1px solid #d4af37;
             background-color: #121824;
             color: white;
             border-radius: 8px;
@@ -62,10 +62,11 @@
             outline: none;
         }
 
+        /* Gold Buttons */
         button {
             padding: 10px 15px;
-            background-color: #2b5278;
-            color: white;
+            background-color: #d4af37;
+            color: #121824;
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -75,11 +76,12 @@
         }
 
         button:hover {
-            background-color: #386795;
+            background-color: #ffcc00;
         }
 
         .delete-all-btn {
             background-color: #d32f2f;
+            color: white;
             width: 100%;
             margin-top: 5px;
         }
@@ -101,8 +103,12 @@
 
         .player-item button {
             background-color: #d32f2f;
+            color: white;
             padding: 4px 8px;
             font-size: 12px;
+        }
+        .player-item button:hover {
+            background-color: #f44336;
         }
 
         /* Wheel Section */
@@ -128,7 +134,7 @@
             height: 0;
             border-left: 12px solid transparent;
             border-right: 12px solid transparent;
-            border-top: 22px solid #f44336;
+            border-top: 22px solid #d4af37;
             z-index: 10;
         }
 
@@ -141,17 +147,20 @@
 
         .spin-btn {
             width: 100%;
-            background-color: #2e7d32;
+            background-color: #d4af37;
+            color: #121824;
             padding: 12px;
             font-size: 16px;
             border-radius: 8px;
             margin-top: 10px;
+            font-weight: bold;
         }
         .spin-btn:hover {
-            background-color: #388e3c;
+            background-color: #ffcc00;
         }
         .spin-btn:disabled {
             background-color: #555;
+            color: #888;
             cursor: not-allowed;
         }
 
@@ -174,7 +183,7 @@
 <body>
 
     <div class="container">
-        <h2>🎡 بۆتی چەرخی بەخت</h2>
+        <h2>🎡 بۆتی چەرخی بەختی ARAN</h2>
 
         <!-- Input Card -->
         <div class="input-card">
@@ -258,7 +267,6 @@
             ctx.clearRect(0, 0, diameter, diameter);
 
             if (numSegments === 0) {
-                // Draw empty gray circle
                 ctx.beginPath();
                 ctx.arc(radius, radius, radius, 0, 2 * Math.PI);
                 ctx.fillStyle = '#222';
@@ -291,20 +299,20 @@
                 ctx.restore();
             }
 
-            // Draw center white circle (TM style)
+            // Draw center circle with ARAN text
             ctx.beginPath();
-            ctx.arc(radius, radius, 35, 0, 2 * Math.PI);
-            ctx.fillStyle = '#ffffff';
+            ctx.arc(radius, radius, 40, 0, 2 * Math.PI);
+            ctx.fillStyle = '#1e2636';
             ctx.fill();
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#d4af37';
             ctx.stroke();
 
-            ctx.fillStyle = '#000000';
-            ctx.font = 'bold 14px Tahoma, sans-serif';
+            ctx.fillStyle = '#d4af37';
+            ctx.font = 'bold 13px Tahoma, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('TM', radius, radius);
+            ctx.fillText('ARAN', radius, radius);
         }
 
         spinButton.addEventListener('click', () => {
@@ -327,8 +335,7 @@
 
                 const eliminated = items[finalIndex].text;
 
-                // Apology message and elimination
-                messageArea.textContent = `داوای لێبووردن دەکەین '${eliminated}'، تۆ دەرکەرای لە ناو یاری! ❌`;
+                messageArea.textContent = `داوای لێبووردن دەکەین '${eliminated}'، تۆ دەرکرای لە ناو یاری! ❌`;
                 messageArea.classList.add('show');
 
                 items.splice(finalIndex, 1);
@@ -353,7 +360,6 @@
             }
         });
 
-        // Initial render
         updateUI();
     </script>
 </body>
