@@ -3,211 +3,270 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>چەرخی بەختی "ARAN"</title>
+    <title>بۆتی چەرخی بەخت - ARAN</title>
     <style>
         body {
-            background-color: #000000;
+            background-color: #121824;
             color: #fff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             min-height: 100vh;
             margin: 0;
-            overflow-x: hidden;
-        }
-
-        h1 {
-            margin-top: 0;
-            color: #ffcc00;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            z-index: 11;
-        }
-
-        .wheel-container {
-            position: relative;
-            width: 600px;
-            height: 600px;
-            margin: 20px auto;
-        }
-
-        .wheel-border {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
+            padding: 10px;
             box-sizing: border-box;
-            z-index: 2;
-            /* Use the gold ring from image_1.png */
-            background: radial-gradient(circle at center, transparent 60%, rgba(212, 175, 55, 0.8) 90%, #d4af37 100%),
-            url('image_1.png');
-            background-size: cover;
-            background-position: center;
-            filter: drop-shadow(0 0 15px #d4af37);
         }
 
-        #wheelCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .container {
             width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: transparent; /* Center is transparent to see background ring */
-            transition: transform 5s cubic-bezier(0.2, 0.8, 0.3, 1);
-            z-index: 1;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        /* Pointer */
-        .pointer {
-            position: absolute;
-            top: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-top: 40px solid #d4af37; /* Gold color */
-            z-index: 10;
-            filter: drop-shadow(0 5px 2px rgba(0,0,0,0.5));
-        }
-
-        /* Controls area */
-        .controls {
-            margin-top: 30px;
+        h2 {
+            margin: 10px 0;
+            color: #fff;
+            font-size: 18px;
             text-align: center;
-            z-index: 11;
+        }
+
+        /* Input and buttons area */
+        .input-card, .list-card, .wheel-card {
+            background-color: #1e2636;
+            border-radius: 12px;
+            padding: 15px;
+            width: 100%;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         input[type="text"] {
+            flex: 1;
             padding: 10px;
-            border: 1px solid #d4af37;
-            background-color: #1a1a1a;
+            border: 1px solid #2a3447;
+            background-color: #121824;
             color: white;
-            border-radius: 5px;
-            width: 250px;
-            font-size: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
         }
 
         button {
-            padding: 10px 20px;
-            margin-left: 10px;
-            background-color: #d4af37; /* Gold color */
-            color: #000;
+            padding: 10px 15px;
+            background-color: #2b5278;
+            color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             transition: background-color 0.2s;
         }
 
         button:hover {
-            background-color: #ffcc00;
+            background-color: #386795;
         }
 
-        button#spinButton:disabled {
+        .delete-all-btn {
+            background-color: #d32f2f;
+            width: 100%;
+            margin-top: 5px;
+        }
+        .delete-all-btn:hover {
+            background-color: #f44336;
+        }
+
+        /* Player list display */
+        .player-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #121824;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .player-item button {
+            background-color: #d32f2f;
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        /* Wheel Section */
+        .wheel-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 15px auto;
+        }
+
+        .pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 22px solid #f44336;
+            z-index: 10;
+        }
+
+        #wheelCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transition: transform 4s cubic-bezier(0.15, 0.85, 0.35, 1);
+        }
+
+        .spin-btn {
+            width: 100%;
+            background-color: #2e7d32;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .spin-btn:hover {
+            background-color: #388e3c;
+        }
+        .spin-btn:disabled {
             background-color: #555;
-            color: #ccc;
             cursor: not-allowed;
         }
 
         #messageArea {
-            margin-top: 20px;
-            font-size: 28px;
+            margin-top: 10px;
+            font-size: 14px;
             font-weight: bold;
-            color: #ff4444; /* Red for elimination */
-            min-height: 80px;
+            color: #ff5252;
             text-align: center;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.8);
-            z-index: 11;
-            padding: 20px;
-            background-color: rgba(0,0,0,0.7);
-            border-radius: 10px;
-            display: none; /* Hidden by default */
-        }
-        #messageArea.show {
-             display: block;
-        }
-
-        /* Player list */
-        #playerList {
-            margin-top: 20px;
-            font-size: 16px;
-            color: #aaa;
-            max-width: 400px;
-            text-align: center;
-            z-index: 11;
-        }
-
-        /* Hidden canvas to pre-draw text */
-        canvas#textCanvas {
+            background-color: rgba(211, 47, 47, 0.1);
+            padding: 10px;
+            border-radius: 8px;
             display: none;
         }
-
+        #messageArea.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
 
-    <h1>چەرخی بەختی "ARAN"</h1>
+    <div class="container">
+        <h2>🎡 بۆتی چەرخی بەخت</h2>
 
-    <div class="wheel-container">
-        <div class="pointer"></div>
-        <div class="wheel-border" id="lightRing"></div>
-        <canvas id="wheelCanvas" width="600" height="600"></canvas>
+        <!-- Input Card -->
+        <div class="input-card">
+            <div class="input-group">
+                <input type="text" id="itemName" placeholder="ناوێک بنووسە...">
+                <button id="addButton">زیادکردن</button>
+            </div>
+        </div>
+
+        <!-- List Card -->
+        <div class="list-card" id="listCardContainer">
+            <div id="playersContainer">هیچ ناوێک نییە</div>
+            <button class="delete-all-btn" id="deleteAllBtn">🗑️ سرینەوەی لیست</button>
+        </div>
+
+        <!-- Wheel Card -->
+        <div class="wheel-card">
+            <div class="wheel-container">
+                <div class="pointer"></div>
+                <canvas id="wheelCanvas" width="300" height="300"></canvas>
+            </div>
+            <button class="spin-btn" id="spinButton" disabled>🎯 سوڕاندنی چەرخی بەخت</button>
+            <div id="messageArea"></div>
+        </div>
     </div>
-
-    <div class="controls">
-        <input type="text" id="itemName" placeholder="ناوێک بنووسە و زەخت بکە زیادکردن">
-        <button id="addButton">زیادکردن</button>
-        <button id="spinButton" disabled>سوڕاندن</button>
-    </div>
-
-    <div id="messageArea"></div>
-    <div id="playerList">لیستی بەشداربووان: <span id="namesDisplay">هیچ</span></div>
-
-    <!-- Hidden canvas to draw text per slice -->
-    <canvas id="textCanvas" width="1000" height="100"></canvas>
 
     <script>
         const canvas = document.getElementById('wheelCanvas');
         const ctx = canvas.getContext('2d');
         const spinButton = document.getElementById('spinButton');
         const addButton = document.getElementById('addButton');
+        const deleteAllBtn = document.getElementById('deleteAllBtn');
         const itemNameInput = document.getElementById('itemName');
+        const playersContainer = document.getElementById('playersContainer');
         const messageArea = document.getElementById('messageArea');
-        const namesDisplay = document.getElementById('namesDisplay');
-        
+
         const diameter = canvas.width;
         const radius = diameter / 2;
         let currentRotation = 0;
         let isSpinning = false;
 
-        // Player Items
-        let items = [];
+        let items = [
+            { text: 'دلمان', color: '#4CAF50' },
+            { text: 'شیرە', color: '#FFC107' },
+            { text: 'کەیانبەند', color: '#F44336' },
+            { text: 'م.', color: '#2196F3' }
+        ];
 
-        function updatePlayerList() {
+        const defaultColors = ['#4CAF50', '#FFC107', '#F44336', '#2196F3', '#9C27B0', '#00BCD4', '#FF5722'];
+
+        function updateUI() {
+            playersContainer.innerHTML = '';
             if (items.length === 0) {
-                namesDisplay.textContent = 'هیچ';
+                playersContainer.innerHTML = '<div style="color: #777; text-align: center;">لیستەکە خاڵییە</div>';
                 spinButton.disabled = true;
             } else {
-                namesDisplay.textContent = items.map(item => item.text).join(', ');
                 spinButton.disabled = false;
+                items.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'player-item';
+                    div.innerHTML = `<span>${item.text}</span> <button onclick="removePlayer(${index})">🗑️</button>`;
+                    playersContainer.appendChild(div);
+                });
             }
+            drawWheel();
         }
+
+        window.removePlayer = function(index) {
+            items.splice(index, 1);
+            updateUI();
+        }
+
+        deleteAllBtn.addEventListener('click', () => {
+            items = [];
+            messageArea.classList.remove('show');
+            updateUI();
+        });
 
         function drawWheel() {
             const numSegments = items.length;
             ctx.clearRect(0, 0, diameter, diameter);
-            
-            if (numSegments === 0) return; // Don't draw if no items
+
+            if (numSegments === 0) {
+                // Draw empty gray circle
+                ctx.beginPath();
+                ctx.arc(radius, radius, radius, 0, 2 * Math.PI);
+                ctx.fillStyle = '#222';
+                ctx.fill();
+                return;
+            }
 
             const arcSize = (2 * Math.PI) / numSegments;
-            const colors = ['#d4af37', '#1a1a1a', '#ffcc00', '#333333']; // Gold, Black, Bright Gold, Dark Grey
 
             for (let i = 0; i < numSegments; i++) {
                 const angle = i * arcSize;
@@ -215,10 +274,10 @@
                 ctx.moveTo(radius, radius);
                 ctx.arc(radius, radius, radius, angle, angle + arcSize);
                 ctx.closePath();
-                ctx.fillStyle = colors[i % colors.length];
+                ctx.fillStyle = items[i].color || defaultColors[i % defaultColors.length];
                 ctx.fill();
                 ctx.lineWidth = 1;
-                ctx.strokeStyle = '#fff';
+                ctx.strokeStyle = '#121824';
                 ctx.stroke();
 
                 // Text
@@ -226,74 +285,76 @@
                 ctx.translate(radius, radius);
                 ctx.rotate(angle + arcSize / 2);
                 ctx.textAlign = 'right';
-                ctx.fillStyle = (colors[i % colors.length] === '#1a1a1a' || colors[i % colors.length] === '#333333') ? '#d4af37' : '#1a1a1a'; // Contrast color
-                ctx.font = 'bold 24px Arial, sans-serif';
-                
-                // Handle long names: wrap text or shrink. For simplicity, we'll just truncate or shrink.
-                let text = items[i].text;
-                if (ctx.measureText(text).width > radius * 0.8) {
-                    ctx.font = 'bold 18px Arial, sans-serif';
-                }
-
-                // Draw text from hidden canvas or directly
-                ctx.fillText(text, radius - 40, 8);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 14px Tahoma, sans-serif';
+                ctx.fillText(items[i].text, radius - 25, 5);
                 ctx.restore();
             }
+
+            // Draw center white circle (TM style)
+            ctx.beginPath();
+            ctx.arc(radius, radius, 35, 0, 2 * Math.PI);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#ddd';
+            ctx.stroke();
+
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 14px Tahoma, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('TM', radius, radius);
         }
 
         spinButton.addEventListener('click', () => {
             if (isSpinning || items.length === 0) return;
             isSpinning = true;
             spinButton.disabled = true;
-            spinButton.textContent = 'دەسوڕێت...';
             messageArea.classList.remove('show');
 
-            // Random rotations (between 5 and 10 full spins) + extra random angle
-            const spinAngle = Math.floor(Math.random() * 2000) + 5000;
+            const spinAngle = Math.floor(Math.random() * 2000) + 3000;
             currentRotation += spinAngle;
             canvas.style.transform = `rotate(${currentRotation}deg)`;
 
             setTimeout(() => {
                 isSpinning = false;
                 spinButton.disabled = false;
-                spinButton.textContent = 'سوڕاندن';
 
-                // Calculate the final result based on rotation
                 const segmentAngle = 360 / items.length;
                 const normalizedRotation = (360 - (currentRotation % 360)) % 360;
-                // The pointer is at the top (0 degrees in our adjusted logic).
-                // After animation, the element at top is the winner.
                 const finalIndex = Math.floor(normalizedRotation / segmentAngle);
-                
-                const eliminatedPlayer = items[finalIndex];
-                
-                // Show elimination message
-                messageArea.textContent = `تکایە لێمان ببورە بەڕێز/خانم '${eliminatedPlayer.text}'، تۆ دەرکراوی لە یاری.`;
+
+                const eliminated = items[finalIndex].text;
+
+                // Apology message and elimination
+                messageArea.textContent = `داوای لێبووردن دەکەین '${eliminated}'، تۆ دەرکەرای لە ناو یاری! ❌`;
                 messageArea.classList.add('show');
 
-                // Remove the eliminated player from the list and redraw
                 items.splice(finalIndex, 1);
-                updatePlayerList();
-                drawWheel();
+                updateUI();
 
-            }, 5000); // Match CSS transition time
+            }, 4000);
         });
 
         addButton.addEventListener('click', () => {
             const name = itemNameInput.value.trim();
             if (name) {
-                items.push({ text: name });
-                updatePlayerList();
-                drawWheel();
+                const color = defaultColors[items.length % defaultColors.length];
+                items.push({ text: name, color: color });
                 itemNameInput.value = '';
-            } else {
-                alert('تکایە ناوێک بنووسە.');
+                updateUI();
             }
         });
 
-        // Initial draw
-        drawWheel();
+        itemNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addButton.click();
+            }
+        });
 
+        // Initial render
+        updateUI();
     </script>
 </body>
 </html>
