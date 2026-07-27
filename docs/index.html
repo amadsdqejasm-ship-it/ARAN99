@@ -238,7 +238,7 @@
     </div>
 
     <script>
-        let names = ["ئاماد", "کاروان", "ژیلان", "سنور", "ڕێبین"]; // نموونەی سەرەتایی
+        let names = ["ئاماد", "کاروان", "ژیلان", "سنور", "ڕێبین"];
         let startAngle = 0;
         let arc = 0;
         let spinTimeout = null;
@@ -268,6 +268,7 @@
                 return;
             }
 
+            // کێشانی بەشەکانی چەرخ
             for (let i = 0; i < names.length; i++) {
                 let angle = startAngle + i * arc;
                 ctx.fillStyle = colors[i % colors.length];
@@ -289,6 +290,26 @@
                 ctx.fillText(text, -ctx.measureText(text).width / 2, 0);
                 ctx.restore();
             }
+
+            // بازنەی ناوەندی و نووسینی ناوە بچووکەکە (ARAN)
+            ctx.beginPath();
+            ctx.arc(200, 200, 35, 0, 2 * Math.PI);
+            ctx.fillStyle = "#0b091a";
+            ctx.fill();
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = "#00ffff";
+            ctx.stroke();
+
+            // نووسینی ARAN لە ناوەڕاستدا بە قەبارەیەکی بچووک و ڕوون
+            ctx.save();
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 12px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.shadowColor = "#ff00ff";
+            ctx.shadowBlur = 6;
+            ctx.fillText("ARAN", 200, 200);
+            ctx.restore();
         }
 
         function addName() {
@@ -326,9 +347,11 @@
             isSpinning = true;
             document.getElementById("spinBtn").style.opacity = "0.5";
             
-            spinArcStart = Math.random() * 10 + 10;
+            // خێرایی زیاتر لە دەستپێکدا (خێرا دەسوڕێت)
+            spinArcStart = Math.random() * 20 + 25; 
             spinTime = 0;
-            spinTimeTotal = Math.random() * 3000 + 4000;
+            // کاتی سوڕانەوە کەمکراوەتەوە بۆ ئەوەی خێرا و هەواش بێت
+            spinTimeTotal = Math.random() * 1500 + 2000; 
             rotateWheel();
         }
 
@@ -356,10 +379,8 @@
 
             let eliminatedName = names[index];
             
-            // پیشاندانی پەیامی دەرکردن
             showModal(eliminatedName);
             
-            // لابردنی ناوەکە لە چەرخەکە دوای دەرچوونی
             names.splice(index, 1);
             updateNamesList();
             drawWheel();
@@ -382,7 +403,6 @@
             document.getElementById("resultModal").style.display = "none";
         }
 
-        // باری سەرەتایی
         updateNamesList();
         drawWheel();
     </script>
