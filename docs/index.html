@@ -1,354 +1,390 @@
 <!DOCTYPE html>
-<html lang="ku">
+<html lang="ku" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>چەرخی بەخت - یاری دەرکردن</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-<title>ARAN Lucky Wheel</title>
+        body {
+            background-color: #0b091a;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
 
-<style>
+        h1 {
+            margin: 20px 0;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            font-size: 2.2rem;
+            text-align: center;
+        }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 500px;
+        }
 
-body{
+        /* بەشی زیادکردنی ناوەکان */
+        .input-section {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
 
-background:#8b0000;
-overflow:hidden;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid #ff00ff;
+            background-color: #1a153b;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.2);
+        }
 
-}
+        input[type="text"]:focus {
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        }
 
-/* Fire Background */
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
+        }
 
-body::before{
+        button:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
 
-content:"";
-position:fixed;
-left:0;
-top:0;
-width:100%;
-height:100%;
+        /* لیستی ناوەکان */
+        .names-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            width: 100%;
+            max-height: 120px;
+            overflow-y: auto;
+            padding: 5px;
+            background: rgba(25, 20, 50, 0.6);
+            border-radius: 8px;
+            border: 1px solid #332b69;
+        }
 
-background:
+        .name-tag {
+            background-color: #2b1f5e;
+            border: 1px solid #ff00ff;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 5px rgba(255, 0, 255, 0.3);
+        }
 
-radial-gradient(circle at bottom,#ff3300 0%,transparent 45%),
-radial-gradient(circle at top,#660000 0%,#1a0000 80%);
+        .name-tag span {
+            cursor: pointer;
+            color: #ff4d4d;
+            font-weight: bold;
+        }
 
-animation:fire 3s infinite alternate;
-z-index:-2;
+        /* چەرخ و نیشانە */
+        .wheel-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            margin: 20px 0;
+        }
 
-}
+        .pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #ffff00;
+            z-index: 10;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 0, 0.8));
+        }
 
-@keyframes fire{
+        canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.4), inset 0 0 15px rgba(255, 0, 255, 0.4);
+            border: 6px solid #1a153b;
+        }
 
-0%{
+        .spin-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            background: linear-gradient(45deg, #00ffcc, #0077ff);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+            border-radius: 10px;
+        }
 
-filter:hue-rotate(0deg);
-transform:scale(1);
+        /* پەنجەرەی ئەنجام (Popup) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
 
-}
+        .modal-content {
+            background: linear-gradient(135deg, #1a153b, #2b1f5e);
+            border: 2px solid #ff0055;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(255, 0, 85, 0.6);
+            max-width: 90%;
+            width: 350px;
+            animation: popIn 0.4s ease;
+        }
 
-100%{
+        .modal-content h2 {
+            color: #ff4d4d;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
+        }
 
-filter:hue-rotate(20deg);
-transform:scale(1.08);
+        .modal-content p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
 
-}
+        .modal-content button {
+            background: #ff0055;
+            box-shadow: 0 0 10px rgba(255, 0, 85, 0.5);
+            width: 100%;
+        }
 
-}
-
-.container{
-
-width:100%;
-max-width:430px;
-text-align:center;
-
-}
-
-.flag{
-
-font-size:45px;
-margin-bottom:10px;
-
-}
-
-h1{
-
-color:white;
-margin-bottom:15px;
-font-size:28px;
-
-}
-
-#wheelBox{
-
-position:relative;
-width:340px;
-height:340px;
-margin:auto;
-
-}
-
-#wheel{
-
-width:340px;
-height:340px;
-border-radius:50%;
-border:10px solid gold;
-background:white;
-transition:transform 6s cubic-bezier(.17,.67,.17,1);
-
-}
-
-.center{
-
-position:absolute;
-left:50%;
-top:50%;
-transform:translate(-50%,-50%);
-width:90px;
-height:90px;
-background:black;
-border-radius:50%;
-display:flex;
-justify-content:center;
-align-items:center;
-color:red;
-font-size:28px;
-font-weight:bold;
-border:4px solid white;
-
-}
-
-.pointer{
-
-position:absolute;
-top:-18px;
-left:50%;
-transform:translateX(-50%);
-font-size:40px;
-color:gold;
-
-}
-
-button{
-
-margin-top:25px;
-width:90%;
-height:55px;
-border:none;
-border-radius:15px;
-font-size:22px;
-background:red;
-color:white;
-font-weight:bold;
-cursor:pointer;
-
-}
-
-button:hover{
-
-background:#ff2a2a;
-
-}
-
-#result{
-
-margin-top:20px;
-font-size:22px;
-color:#fff700;
-font-weight:bold;
-
-}
-
-</style>
-
+        @keyframes popIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="container">
+    <h1>چەرخی بەخت</h1>
 
-<div class="flag">☀️</div>
+    <div class="container">
+        <!-- زیادکردنی ناو -->
+        <div class="input-section">
+            <input type="text" id="nameInput" placeholder="ناوی بەشداربوو بنووسە..." autocomplete="off">
+            <button onclick="addName()">زیادکردن</button>
+        </div>
 
-<h1>ARAN Lucky Wheel</h1>
+        <!-- لیستی ناوەکان -->
+        <div class="names-list" id="namesList"></div>
 
-<div id="wheelBox">
+        <!-- چەرخەکە -->
+        <div class="wheel-container">
+            <div class="pointer"></div>
+            <canvas id="wheel" width="400" height="400"></canvas>
+        </div>
 
-<div class="pointer">▼</div>
+        <!-- دوگمەی سوڕاندن -->
+        <button class="spin-btn" onclick="spinWheel()" id="spinBtn">سوڕاندنی چەرخ</button>
+    </div>
 
-<canvas id="wheel" width="340" height="340"></canvas>
+    <!-- پەنجەرەی نیشاندانی دەرکراو -->
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <h2>ئاگاداری!</h2>
+            <p id="resultText"></p>
+            <button onclick="closeModal()">باشە</button>
+        </div>
+    </div>
 
-<div class="center">
+    <script>
+        let names = ["ئاماد", "کاروان", "ژیلان", "سنور", "ڕێبین"]; // نموونەی سەرەتایی
+        let startAngle = 0;
+        let arc = 0;
+        let spinTimeout = null;
+        let spinArcStart = 10;
+        let spinTime = 0;
+        let spinTimeTotal = 0;
+        let isSpinning = false;
 
-ARAN
+        const canvas = document.getElementById("wheel");
+        const ctx = canvas.getContext("2d");
 
-</div>
+        const colors = [
+            "#ff0055", "#00ffff", "#ff00ff", "#00ffcc", 
+            "#ff9900", "#9900ff", "#00ccff", "#ff0066"
+        ];
 
-</div>
+        function drawWheel() {
+            arc = Math.PI / (names.length > 0 ? names.length / 2 : 1);
+            ctx.clearRect(0, 0, 400, 400);
 
-<button onclick="spin()">
+            if (names.length === 0) {
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 18px sans-serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("تکایە ناو زیاد بکە", 200, 200);
+                return;
+            }
 
-🎡 سوراندنی چەرخ
+            for (let i = 0; i < names.length; i++) {
+                let angle = startAngle + i * arc;
+                ctx.fillStyle = colors[i % colors.length];
 
-</button>
+                ctx.beginPath();
+                ctx.arc(200, 200, 190, angle, angle + arc, false);
+                ctx.arc(200, 200, 0, angle + arc, angle, true);
+                ctx.fill();
 
-<div id="result">
-<div style="margin-top:20px;">
+                ctx.save();
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 16px sans-serif";
+                ctx.translate(
+                    200 + Math.cos(angle + arc / 2) * 120,
+                    200 + Math.sin(angle + arc / 2) * 120
+                );
+                ctx.rotate(angle + arc / 2 + Math.PI / 2);
+                let text = names[i];
+                ctx.fillText(text, -ctx.measureText(text).width / 2, 0);
+                ctx.restore();
+            }
+        }
 
-<input
-id="nameInput"
-type="text"
-placeholder="ناو بنووسە..."
-style="
-width:90%;
-height:45px;
-border:none;
-border-radius:10px;
-padding:10px;
-font-size:18px;
-outline:none;
-">
+        function addName() {
+            if (isSpinning) return;
+            const input = document.getElementById("nameInput");
+            const name = input.value.trim();
+            if (name !== "") {
+                names.push(name);
+                input.value = "";
+                updateNamesList();
+                drawWheel();
+            }
+        }
 
-<button onclick="addName()">
+        function removeName(index) {
+            if (isSpinning) return;
+            names.splice(index, 1);
+            updateNamesList();
+            drawWheel();
+        }
 
-➕ زیادکردنی ناو
+        function updateNamesList() {
+            const listDiv = document.getElementById("namesList");
+            listDiv.innerHTML = "";
+            names.forEach((name, index) => {
+                let tag = document.createElement("div");
+                tag.className = "name-tag";
+                tag.innerHTML = `${name} <span onclick="removeName(${index})">&times;</span>`;
+                listDiv.appendChild(tag);
+            });
+        }
 
-</button>
+        function spinWheel() {
+            if (isSpinning || names.length === 0) return;
+            isSpinning = true;
+            document.getElementById("spinBtn").style.opacity = "0.5";
+            
+            spinArcStart = Math.random() * 10 + 10;
+            spinTime = 0;
+            spinTimeTotal = Math.random() * 3000 + 4000;
+            rotateWheel();
+        }
 
-<button onclick="clearNames()">
+        function rotateWheel() {
+            spinTime += 30;
+            if (spinTime >= spinTimeTotal) {
+                stopRotateWheel();
+                return;
+            }
+            let spinAngle = spinArcStart - easeOut(spinTime, 0, spinArcStart, spinTimeTotal);
+            startAngle += (spinAngle * Math.PI) / 180;
+            drawWheel();
+            spinTimeout = setTimeout(rotateWheel, 30);
+        }
 
-🗑 سڕینەوەی هەموو
+        function stopRotateWheel() {
+            isSpinning = false;
+            document.getElementById("spinBtn").style.opacity = "1";
+            clearTimeout(spinTimeout);
 
-</button>
+            let degrees = (startAngle * 180) / Math.PI + 90;
+            let arcd = (arc * 180) / Math.PI;
+            let index = Math.floor((360 - (degrees % 360)) / arcd);
+            index = (index + names.length) % names.length;
 
-<div id="list"
+            let eliminatedName = names[index];
+            
+            // پیشاندانی پەیامی دەرکردن
+            showModal(eliminatedName);
+            
+            // لابردنی ناوەکە لە چەرخەکە دوای دەرچوونی
+            names.splice(index, 1);
+            updateNamesList();
+            drawWheel();
+        }
 
-style="
+        function easeOut(t, b, c, d) {
+            let ts = (t /= d) * t;
+            let tc = ts * t;
+            return b + c * (tc + -3 * ts + 3 * t);
+        }
 
-margin-top:20px;
-background:#ffffff22;
-padding:15px;
-border-radius:15px;
-color:white;
-font-size:18px;
-max-height:180px;
-overflow:auto;
+        function showModal(name) {
+            const modal = document.getElementById("resultModal");
+            const resultText = document.getElementById("resultText");
+            resultText.innerHTML = `ببورە <span style="color: #00ffff; font-weight: bold;">${name}</span> تو دەرکرای لە یاری!`;
+            modal.style.display = "flex";
+        }
 
-">
+        function closeModal() {
+            document.getElementById("resultModal").style.display = "none";
+        }
 
-</div>
-
-</div>
-</div>
-
-</div>
-<script>
-const names = [
-"ARAN",
-"KARWAN",
-"SARA",
-"ALI",
-"DANA",
-"REBIN",
-"SHWAN",
-"RANYA"
-];
-
-const canvas = document.getElementById("wheel");
-const ctx = canvas.getContext("2d");
-
-let startAngle = 0;
-let spinning = false;
-
-function drawWheel(){
-
-const arc = (Math.PI*2)/names.length;
-
-ctx.clearRect(0,0,340,340);
-
-for(let i=0;i<names.length;i++){
-
-const angle = startAngle + i*arc;
-
-ctx.beginPath();
-ctx.moveTo(170,170);
-ctx.arc(170,170,170,angle,angle+arc);
-ctx.fillStyle=i%2==0?"#ff2b2b":"#b30000";
-ctx.fill();
-
-ctx.save();
-
-ctx.translate(170,170);
-ctx.rotate(angle+arc/2);
-
-ctx.fillStyle="white";
-ctx.font="bold 18px Arial";
-ctx.textAlign="right";
-ctx.fillText(names[i],145,8);
-
-ctx.restore();
-
-}
-
-}
-
-drawWheel();
-
-function spin(){
-
-if(spinning) return;
-
-spinning=true;
-
-const random=Math.floor(Math.random()*360)+1440;
-
-canvas.style.transform="rotate("+random+"deg)";
-
-setTimeout(()=>{
-
-const degree=random%360;
-
-const arc=360/names.length;
-
-const index=Math.floor(((360-degree)+90)%360/arc);
-
-const loser=names[index];
-
-document.getElementById("result").innerHTML=
-"❌ ببورە، <b>"+loser+"</b> دەرکرای لە یاری.";
-
-names.splice(index,1);
-
-if(names.length>1){
-
-canvas.style.transition="none";
-canvas.style.transform="rotate(0deg)";
-setTimeout(()=>{
-canvas.style.transition="transform 6s cubic-bezier(.17,.67,.17,1)";
-drawWheel();
-spinning=false;
-},50);
-
-}else{
-
-document.getElementById("result").innerHTML=
-"🏆 براوە: "+names[0];
-
-}
-
-},6000);
-
-}
-</script>
-
+        // باری سەرەتایی
+        updateNamesList();
+        drawWheel();
+    </script>
 </body>
 </html>
