@@ -242,7 +242,7 @@
         let startAngle = 0;
         let arc = 0;
         let spinTimeout = null;
-        let spinArcStart = 10;
+        let spinAngleStart = 0;
         let spinTime = 0;
         let spinTimeTotal = 0;
         let isSpinning = false;
@@ -268,7 +268,6 @@
                 return;
             }
 
-            // کێشانی بەشەکانی چەرخ
             for (let i = 0; i < names.length; i++) {
                 let angle = startAngle + i * arc;
                 ctx.fillStyle = colors[i % colors.length];
@@ -291,7 +290,7 @@
                 ctx.restore();
             }
 
-            // بازنەی ناوەندی و نووسینی ناوە بچووکەکە (ARAN)
+            // بازنەی ناوەندی و نووسینی ARAN
             ctx.beginPath();
             ctx.arc(200, 200, 35, 0, 2 * Math.PI);
             ctx.fillStyle = "#0b091a";
@@ -300,7 +299,6 @@
             ctx.strokeStyle = "#00ffff";
             ctx.stroke();
 
-            // نووسینی ARAN لە ناوەڕاستدا بە قەبارەیەکی بچووک و ڕوون
             ctx.save();
             ctx.fillStyle = "#ffffff";
             ctx.font = "bold 12px sans-serif";
@@ -347,11 +345,11 @@
             isSpinning = true;
             document.getElementById("spinBtn").style.opacity = "0.5";
             
-            // خێرایی زیاتر لە دەستپێکدا (خێرا دەسوڕێت)
-            spinArcStart = Math.random() * 20 + 25; 
+            // دیاریکردنی ١٠ خولگەی تەواو بە خێراییەکی زۆر و پاشان هێواشبوونەوە
             spinTime = 0;
-            // کاتی سوڕانەوە کەمکراوەتەوە بۆ ئەوەی خێرا و هەواش بێت
-            spinTimeTotal = Math.random() * 1500 + 2000; 
+            spinTimeTotal = 4000; // 4 چرکە بۆ کاتی سوڕانەوە
+            spinAngleStart = (10 * 360) + Math.random() * 360; // 10 خولگەی تەواو + کەمێک زیادە بۆ شوێنی کۆتایی
+            
             rotateWheel();
         }
 
@@ -361,8 +359,8 @@
                 stopRotateWheel();
                 return;
             }
-            let spinAngle = spinArcStart - easeOut(spinTime, 0, spinArcStart, spinTimeTotal);
-            startAngle += (spinAngle * Math.PI) / 180;
+            let angleChange = easeOut(spinTime, 0, spinAngleStart, spinTimeTotal) - easeOut(spinTime - 30, 0, spinAngleStart, spinTimeTotal);
+            startAngle += (angleChange * Math.PI) / 180;
             drawWheel();
             spinTimeout = setTimeout(rotateWheel, 30);
         }
